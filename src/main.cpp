@@ -15,7 +15,11 @@ void thread_task(int num_threads, int current)
     }
 }
 
+#include <chrono>
+
 int main() {
+    auto start = std::chrono::high_resolution_clock::now();
+
     // boost::this_fiber::sleep_for(std::chrono::seconds(10));
     boost::fibers::use_scheduling_algorithm<boost::fibers::algo::shared_work>();
     Engine engine;
@@ -55,5 +59,10 @@ int main() {
     for (auto &thread: threads) {
         thread.join();
     }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "Execution time: " << duration.count() << " milliseconds" << std::endl;
+    
     return 0;
 }
