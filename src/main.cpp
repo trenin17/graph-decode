@@ -6,8 +6,16 @@ boost::fibers::condition_variable cv;
 boost::fibers::mutex mt;
 bool ready = false;
 
+void bind_to_core(DWORD core_id)
+{
+    HANDLE thread           = GetCurrentThread();  // Get handle to the current thread
+    DWORD_PTR affinity_mask = 1ll << core_id;      // Create a bitmask with the desired core
+    SetThreadAffinityMask(thread, affinity_mask);  // Bind thread to core
+}
+
 void thread_task(int num_threads, int current)
 {
+    bind_to_core(current);
     boost::fibers::use_scheduling_algorithm<boost::fibers::algo::shared_work>();
     std::unique_lock<boost::fibers::mutex> guard(mt);
     while (!ready) {
@@ -20,7 +28,7 @@ void thread_task(int num_threads, int current)
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    // boost::this_fiber::sleep_for(std::chrono::seconds(10));
+    //boost::this_fiber::sleep_for(std::chrono::seconds(10));
     boost::fibers::use_scheduling_algorithm<boost::fibers::algo::shared_work>();
     Engine engine;
     std::cout << "Initializing" << std::endl;
@@ -34,6 +42,7 @@ int main() {
     for (int i = 0; i < num_threads - 1; ++i) {
         threads.emplace_back([num_threads, i]() { thread_task(num_threads, i); });
     }
+    bind_to_core(num_threads - 1);
 
     std::cout << "Pushing input" << std::endl;
     for (int i = 0; i < 1000000; i++) {
