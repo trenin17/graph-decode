@@ -3,3 +3,5 @@ build
 build_debug
 .vscode/
 CMakeUserPresets.json
+build_deb_threads
+build_deb_tbb

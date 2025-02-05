@@ -1,5 +1,3 @@
-#include <boost/fiber/mutex.hpp>
-#include <boost/fiber/condition_variable.hpp>
 #include <queue>
 
 struct Packet {
@@ -11,18 +9,18 @@ class PacketQueue {
 public:
 
     void push(Packet packet) {
-        std::unique_lock<boost::fibers::mutex> lock(mt);
+        // std::unique_lock<boost::fibers::mutex> lock(mt);
         queue.push(packet);
-        lock.unlock();
-        condition.notify_one();
+        // lock.unlock();
+        // condition.notify_one();
     }
 
     Packet pop() {
         //std::cout << "Pop" << std::endl;
-        std::unique_lock<boost::fibers::mutex> lock(mt);
+        // std::unique_lock<boost::fibers::mutex> lock(mt);
         while (queue.empty()) {
             //std::cout << "Empty" << std::endl;
-            condition.wait(lock);
+            // condition.wait(lock);
         }
         Packet packet = queue.front();
         queue.pop();
@@ -31,14 +29,12 @@ public:
     }
 
     bool empty() {
-        std::unique_lock<boost::fibers::mutex> lock(mt);
+        // std::unique_lock<boost::fibers::mutex> lock(mt);
         return queue.empty();
     }
 
 private:
     std::queue<Packet> queue;
-    boost::fibers::mutex mt;
-    boost::fibers::condition_variable condition;
 };
 
 struct PacketQueuePtr {

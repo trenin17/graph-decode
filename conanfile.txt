@@ -1,5 +1,8 @@
 [requires]
+onetbb/2021.12.0
 
+[options]
+onetbb/*:shared=False
 
 [generators]
 CMakeToolchain
