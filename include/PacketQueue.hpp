@@ -5,7 +5,7 @@ struct Packet {
     bool eof = false;
 };
 
-class PacketQueue {
+/*class PacketQueue {
 public:
 
     void push(Packet packet) {
@@ -51,3 +51,4 @@ struct PacketQueuePtr {
 private:
     PacketQueue* queue;   
 };
+*/
