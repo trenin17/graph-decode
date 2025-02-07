@@ -45,7 +45,7 @@ int main() {
     bind_to_core(num_threads - 1);
 
     std::cout << "Pushing input" << std::endl;
-    for (int i = 0; i < 1000000; i++) {
+    for (int i = 0; i < 10000000; i++) {
         engine.pushInput({i});
     }
     engine.pushInput({-1, true});

@@ -7,6 +7,6 @@ add_executable(MyBoostFibersExecutable main.cpp)
 # Link Boost Fibers
 target_link_libraries(MyBoostFibersExecutable
     PRIVATE
-    boost_fiber-vc143-mt-gd-x64-1_83
+    boost_fiber-vc143-mt-x64-1_83
     #boost_context-vc143-mt-gd-x64-1_83
 )
