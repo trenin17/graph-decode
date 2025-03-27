@@ -1,5 +1,4 @@
 libs
-build
-build_debug
+build*
 .vscode/
 CMakeUserPresets.json
