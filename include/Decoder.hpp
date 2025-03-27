@@ -1,4 +1,5 @@
 #include "PacketQueue.hpp"
+#include <functional>
 
 class Decoder {
 public:

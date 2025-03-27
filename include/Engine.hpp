@@ -2,6 +2,7 @@
 #include <optional>
 #include <memory>
 #include <algorithm>
+#include <random>
 
 class NonCopyable {
 public:
@@ -73,7 +74,7 @@ public:
             std::mt19937 g(rd());
 
             std::vector<size_t> hashes;
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < 3; i++) {
                 hashes.push_back(std::hash<std::string>{}(packet.data));
                 std::shuffle(packet.data, packet.data + 127, g);  
             }

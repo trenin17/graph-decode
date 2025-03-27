@@ -8,14 +8,14 @@ public:
     PacketQueue(size_t mem_pool_size) : pool(mem_pool_size) {}
 
     void flush_page() {
-        std::unique_lock<boost::fibers::mutex> lock(mt);
+        std::unique_lock<std::mutex> lock(mt);
         queue.push(std::move(push_page));
         lock.unlock();
         queue_not_empty.notify_one();
     }
 
     void push(const BlobPacket& packet) {
-        std::unique_lock<boost::fibers::mutex> lock(push_mt);
+        std::unique_lock<std::mutex> lock(push_mt);
         if (!(push_page == nullptr) && push_page.full()) {
             flush_page();
         }
@@ -31,9 +31,9 @@ public:
     BlobPacket pop() {
         // std::cout << "Pop" << std::endl;
         if (pop_queue.empty()) {
-            std::unique_lock<boost::fibers::mutex> lock(mt);
+            std::unique_lock<std::mutex> lock(mt);
             while (queue.empty()) {
-                queue_not_empty.wait_for(lock, std::chrono::seconds(1));    
+                queue_not_empty.wait(lock);    
             }
             pop_page = std::move(queue.front());
             queue.pop();
@@ -49,7 +49,7 @@ public:
     }
 
     bool empty() {
-        std::unique_lock<boost::fibers::mutex> lock(mt);
+        std::unique_lock<std::mutex> lock(mt);
         return queue.empty();
     }
 
@@ -67,12 +67,12 @@ private:
     MemoryPagePtr push_page{&pool}, pop_page;
     std::queue<BlobPacket*> pop_queue;
 
-    boost::fibers::mutex push_mt;
+    std::mutex push_mt;
     size_t n_producers = 0;
 
     std::queue<MemoryPagePtr> queue;
-    boost::fibers::mutex mt;
-    boost::fibers::condition_variable queue_not_empty;
+    std::mutex mt;
+    std::condition_variable queue_not_empty;
 };
 
 struct PacketQueuePtr {

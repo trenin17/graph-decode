@@ -1,5 +1,5 @@
-#include <boost/fiber/mutex.hpp>
-#include <boost/fiber/condition_variable.hpp>
+#include <mutex>
+#include <condition_variable>
 
 #include <queue>
 #include <array>
@@ -40,7 +40,7 @@ private:
     MemoryPagePtr allocate();
 
     void free_page(size_t id) {
-        std::lock_guard<boost::fibers::mutex> lock(mt);
+        std::lock_guard<std::mutex> lock(mt);
         free_pages.push(id);
         page_available.notify_one();
     }
@@ -48,8 +48,8 @@ private:
     std::queue<size_t> free_pages;
     std::vector<MemoryPage> pages;
 
-    boost::fibers::mutex mt;
-    boost::fibers::condition_variable page_available;
+    std::mutex mt;
+    std::condition_variable page_available;
 
     friend class MemoryPagePtr;
 };
@@ -143,9 +143,8 @@ bool operator==(std::nullptr_t, const MemoryPagePtr& ptr) {
 }
 
 MemoryPagePtr MemoryPool::allocate(){
-    std::unique_lock<boost::fibers::mutex> lock(mt);
-    while (free_pages.empty()) 
-        page_available.wait_for(lock, std::chrono::milliseconds(100), [this](){ 
+    std::unique_lock<std::mutex> lock(mt);
+    page_available.wait(lock, [this](){ 
             return !free_pages.empty(); });
     // std::cout << "Page ready" << std::endl;
 
