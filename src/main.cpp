@@ -26,6 +26,8 @@ void thread_task(int num_threads, int current)
 #include <chrono>
 
 int main(int argc, char *argv[]) {
+    static_assert(sizeof(BlobPacket) == 128, "BlobPacket size is not 128 bytes");
+
     auto start = std::chrono::high_resolution_clock::now();
 
     size_t num_iterations = 0;
@@ -73,7 +75,7 @@ int main(int argc, char *argv[]) {
 
     for (int i = 0; i < num_iterations; i++) {
         BlobPacket packet;
-        for (int j = 0; j < 127; j++) {
+        for (int j = 0; j < 119; j++) {
             packet.data[j] = 'a' + (i + j) % 26;
         }
         engine.pushInput(std::move(packet));

@@ -7,8 +7,8 @@
 class BlobPacket{
 public:
     bool is_eof = false;
-    char data[127];
-    std::string prev_decoder;
+    char data[119];
+    size_t prev_decoder = 0;
 };
 
 class MemoryPagePtr;
