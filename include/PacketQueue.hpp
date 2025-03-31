@@ -76,6 +76,7 @@ private:
 };
 
 struct PacketQueuePtr {
+    PacketQueuePtr() = default;
     PacketQueuePtr(PacketQueue& queue) : queue(&queue) {}
 
     void push(const BlobPacket& packet) {
@@ -95,5 +96,5 @@ struct PacketQueuePtr {
     }
 
 private:
-    PacketQueue* queue;   
+    PacketQueue* queue = nullptr;   
 };

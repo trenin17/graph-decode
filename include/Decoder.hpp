@@ -3,8 +3,20 @@
 
 class Decoder {
 public:
-    Decoder(std::string name, PacketQueuePtr incoming, std::vector<PacketQueuePtr> outgoing,
-            std::function<void(BlobPacket)> func = [](BlobPacket){}) : incoming(incoming), outgoing(outgoing), name(name), processPacket(func) {
+    Decoder(size_t name, PacketQueuePtr incoming, std::vector<PacketQueuePtr> outgoing,
+            std::function<void(BlobPacket)> func = [](BlobPacket){}) : incoming(incoming), outgoing(outgoing), id(name), processPacket(func) {
+    }
+
+    void AddOutgoing(PacketQueuePtr queue) {
+        outgoing.push_back(queue);
+    }
+
+    void AddPacketHandler(std::function<void(BlobPacket)> func) {
+        processPacket = func;
+    }
+
+    PacketQueuePtr GetIncoming() {
+        return incoming;
     }
 
     void init() {
@@ -30,7 +42,7 @@ public:
     }
 
     void SendPacket(BlobPacket&& packet) {
-        packet.prev_decoder = name;
+        packet.prev_decoder = id;
         //std::cout << "Sending packet " << packet.data << " to " << outgoing.size() << " queues" << std::endl;
         for (auto& queue : outgoing) {
             queue.push(packet);
@@ -42,5 +54,5 @@ private:
     std::vector<PacketQueuePtr> outgoing;
     std::function<void(BlobPacket)> processPacket;
     size_t n_eofs = 0;
-    std::string name;
+    size_t id = 0;
 };
