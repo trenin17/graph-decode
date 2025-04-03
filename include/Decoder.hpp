@@ -1,17 +1,28 @@
 #include "PacketQueue.hpp"
 #include <functional>
+#include <Windows.h>
+#include <processthreadsapi.h>
+#include <winbase.h>
+
+
+void bind_to_core(DWORD core_id)
+{
+    HANDLE thread           = GetCurrentThread();  // Get handle to the current thread
+    DWORD_PTR affinity_mask = 1ll << core_id;      // Create a bitmask with the desired core
+    SetThreadAffinityMask(thread, affinity_mask);  // Bind thread to core
+}
 
 class Decoder {
 public:
     Decoder(size_t name, PacketQueuePtr incoming, std::vector<PacketQueuePtr> outgoing,
-            std::function<void(BlobPacket)> func = [](BlobPacket){}) : incoming(incoming), outgoing(outgoing), id(name), processPacket(func) {
+            std::function<void(const BlobPacket&)> func = [](const BlobPacket&){}) : incoming(incoming), outgoing(outgoing), id(name), processPacket(func) {
     }
 
     void AddOutgoing(PacketQueuePtr queue) {
         outgoing.push_back(queue);
     }
 
-    void AddPacketHandler(std::function<void(BlobPacket)> func) {
+    void AddPacketHandler(std::function<void(const BlobPacket&)> func) {
         processPacket = func;
     }
 
@@ -26,12 +37,13 @@ public:
     }
 
     void Run() {
+        //bind_to_core(id);
         //std::cout << "Running decoder" << std::endl;
         while (true) {
             BlobPacket packet = incoming.pop();
             bool eof = packet.is_eof;
             processPacket(packet);
-            SendPacket(std::move(packet));
+            SendPacket(packet);
             if (eof) {
                 n_eofs++;
                 if (n_eofs == incoming.get_producers()) {
@@ -41,7 +53,7 @@ public:
         }
     }
 
-    void SendPacket(BlobPacket&& packet) {
+    void SendPacket(BlobPacket& packet) {
         packet.prev_decoder = id;
         //std::cout << "Sending packet " << packet.data << " to " << outgoing.size() << " queues" << std::endl;
         for (auto& queue : outgoing) {
@@ -52,7 +64,7 @@ public:
 private:
     PacketQueuePtr incoming;
     std::vector<PacketQueuePtr> outgoing;
-    std::function<void(BlobPacket)> processPacket;
+    std::function<void(const BlobPacket&)> processPacket;
     size_t n_eofs = 0;
     size_t id = 0;
 };

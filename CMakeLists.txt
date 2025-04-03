@@ -4,6 +4,7 @@ project(MyBoostFibersProject)
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_GENERATOR_PLATFORM x64)
 
 # Include Conan-generated files
 #include(${CMAKE_BINARY_DIR}/conan_toolchain.cmake)
