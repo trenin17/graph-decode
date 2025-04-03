@@ -32,11 +32,15 @@ int main(int argc, char *argv[]) {
 
     size_t num_iterations = 0;
     size_t memory_pool_size = 0;
+    size_t network_id = 1;
     if (argc >= 3) {
         num_iterations = std::stoull(argv[1]);
         memory_pool_size = std::stoull(argv[2]);
+        if (argc >= 4) {
+            network_id = std::stoull(argv[3]);
+        }
     } else {
-        std::cerr << "Usage: " << argv[0] << " <num_iterations> <memory_pool_size>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <num_iterations> <memory_pool_size> <network_id>" << std::endl;
         return 1;
     }
 
@@ -44,7 +48,7 @@ int main(int argc, char *argv[]) {
     boost::fibers::use_scheduling_algorithm<boost::fibers::algo::shared_work>();
     Engine engine{memory_pool_size};
     std::cout << "Initializing" << std::endl;
-    engine.init();
+    engine.init(network_id);
     std::cout << "Running" << std::endl;
     engine.run();
 
@@ -66,7 +70,7 @@ int main(int argc, char *argv[]) {
             if (packet.is_eof) {
                 eof_cnt++;
                 // std::cout << "EOF " << eof_cnt << std::endl;
-                if (eof_cnt == 3) {
+                if (eof_cnt == engine.GetProducersCount()) {
                     break;
                 }
             }
