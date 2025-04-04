@@ -1,16 +1,5 @@
 #include "PacketQueue.hpp"
 #include <functional>
-#include <Windows.h>
-#include <processthreadsapi.h>
-#include <winbase.h>
-
-
-void bind_to_core(DWORD core_id)
-{
-    HANDLE thread           = GetCurrentThread();  // Get handle to the current thread
-    DWORD_PTR affinity_mask = 1ll << core_id;      // Create a bitmask with the desired core
-    SetThreadAffinityMask(thread, affinity_mask);  // Bind thread to core
-}
 
 class Decoder {
 public:
@@ -37,7 +26,6 @@ public:
     }
 
     void Run() {
-        //bind_to_core(id);
         //std::cout << "Running decoder" << std::endl;
         while (true) {
             BlobPacket packet = incoming.pop();
