@@ -25,7 +25,7 @@ public:
     
 private:
     size_t next_packet = 0;
-    std::array<BlobPacket, 16> packets;
+    std::array<BlobPacket, 32> packets;
     friend class MemoryPagePtr;
 };
 
