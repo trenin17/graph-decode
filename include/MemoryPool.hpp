@@ -5,7 +5,7 @@
 #include <array>
 
 #pragma pack(push, 1)
-class BlobPacket{
+class alignas(128) BlobPacket{
 public:
     bool is_eof = false;
     char data[119];
@@ -25,7 +25,7 @@ public:
     
 private:
     size_t next_packet = 0;
-    std::array<BlobPacket, 16> packets;
+    std::array<BlobPacket, 32> packets;
     friend class MemoryPagePtr;
 };
 

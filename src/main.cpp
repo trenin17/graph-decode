@@ -32,10 +32,13 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Pushing input" << std::endl;
 
+    size_t n_total_packets = 0;
+
     auto final_fiber = std::make_unique<std::thread>([&]() mutable {
         auto eof_cnt = 0;
         while (true) {
             auto packet = engine.popOutput();
+            // n_total_packets++;
             //std::cout << packet.data << std::endl;
             if (packet.is_eof) {
                 eof_cnt++;
@@ -62,6 +65,7 @@ int main(int argc, char *argv[]) {
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    // std::cout << "Total packets processed: " << n_total_packets << std::endl;
     std::cout << "Execution time: " << duration.count() << " milliseconds" << std::endl;
     
     return 0;
