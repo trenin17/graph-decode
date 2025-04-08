@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 
     for (int i = 0; i < num_iterations; i++) {
         BlobPacket packet;
-        for (int j = 0; j < 119; j++) {
+        for (int j = 0; j < PACKET_DATA_SIZE; j++) {
             packet.data[j] = 'a' + (i + j) % 26;
         }
         engine.pushInput(std::move(packet));

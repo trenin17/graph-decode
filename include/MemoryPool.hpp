@@ -4,11 +4,13 @@
 #include <queue>
 #include <array>
 
+const size_t PACKET_DATA_SIZE = 119;
+
 #pragma pack(push, 1)
 class alignas(128) BlobPacket{
 public:
     bool is_eof = false;
-    char data[119];
+    char data[PACKET_DATA_SIZE];
     size_t prev_decoder = 0;
 };
 #pragma pack(pop)
@@ -25,7 +27,7 @@ public:
     
 private:
     size_t next_packet = 0;
-    std::array<BlobPacket, 32> packets;
+    std::array<BlobPacket, 16> packets;
     friend class MemoryPagePtr;
 };
 

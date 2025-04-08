@@ -234,7 +234,7 @@ private:
         std::vector<size_t> hashes;
         for (int i = 0; i < 3; i++) {
             hashes.push_back(std::hash<std::string>{}(copy.data));
-            std::shuffle(copy.data, copy.data + 127, g);  
+            std::shuffle(copy.data, copy.data + PACKET_DATA_SIZE, g);  
         }
     };
 };
