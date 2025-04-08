@@ -33,6 +33,12 @@ public:
             case 5:
                 CreateNetwork5();
                 break;
+            case 6:
+                CreateNetwork6();
+                break;
+            case 7:
+                CreateNetwork7();
+                break;
             default:
                 CreateNetwork1();
         }
@@ -143,6 +149,45 @@ public:
 
         input = decoders[99]->GetIncoming();
         decoders[99]->AddPacketHandler(long_processing);
+    }
+
+    void CreateNetwork6() {
+        for (size_t i = 0; i < 1002; i++) {
+            CreateDecoder();
+        }
+        for (size_t i = 0; i < 10; i++) {
+            for (size_t j = 0; j < 100; j++) {
+                size_t to = i * 100 + j;
+                if (j == 0) to = 0;
+                MakeEdge(i * 100 + j + 1, to);
+            }
+        }
+        for (size_t i = 0; i < 10; i++) {
+            MakeEdge(1001, (i+1) * 100);
+        }
+        
+        input = decoders[1001]->GetIncoming();
+        decoders[1001]->AddPacketHandler(long_processing);
+    }
+
+    void CreateNetwork7() {
+        for (size_t i = 0; i < 8; i++) {
+            CreateDecoder();
+        }
+        for (size_t i = 0; i < 3; i++) {
+            for (size_t j = 0; j < 2; j++) {
+                size_t to = i * 2 + j;
+                if (j == 0) to = 0;
+                MakeEdge(i * 2 + j + 1, to);
+            }
+        }
+        for (size_t i = 0; i < 3; i++) {
+            MakeEdge(7, (i+1) * 2);
+        }
+
+        input = decoders[7]->GetIncoming();
+        decoders[7]->AddPacketHandler(long_processing);
+        decoders[0]->AddPacketHandler(long_processing);
     }
 
     void run() {
