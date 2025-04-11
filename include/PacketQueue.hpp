@@ -1,6 +1,6 @@
 #include <queue>
 
-#include "MemoryPool.hpp"
+#include "RingBufferQueue.hpp"
 
 class PacketQueue {
 public:
@@ -65,12 +65,13 @@ public:
 private:
     MemoryPool pool;
     MemoryPagePtr push_page{&pool}, pop_page;
-    std::queue<BlobPacket*> pop_queue;
+    RingBufferQueue<BlobPacket*, MEMORY_PAGE_SIZE> pop_queue;
 
     std::mutex push_mt;
     size_t n_producers = 0;
 
-    std::queue<MemoryPagePtr> queue;
+    // Size doesn't sync with mem_pool_size
+    RingBufferQueue<MemoryPagePtr, 16> queue;
     std::mutex mt;
     std::condition_variable queue_not_empty;
 };

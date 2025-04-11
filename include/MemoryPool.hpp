@@ -5,6 +5,7 @@
 #include <array>
 
 const size_t PACKET_DATA_SIZE = 119;
+const size_t MEMORY_PAGE_SIZE = 16;
 
 #pragma pack(push, 1)
 class alignas(128) BlobPacket{
@@ -27,7 +28,7 @@ public:
     
 private:
     size_t next_packet = 0;
-    std::array<BlobPacket, 16> packets;
+    std::array<BlobPacket, MEMORY_PAGE_SIZE> packets;
     friend class MemoryPagePtr;
 };
 
