@@ -8,7 +8,7 @@ const size_t PACKET_DATA_SIZE = 119;
 const size_t MEMORY_PAGE_SIZE = 16;
 
 #pragma pack(push, 1)
-class alignas(128) BlobPacket{
+class BlobPacket{
 public:
     bool is_eof = false;
     char data[PACKET_DATA_SIZE];
@@ -45,8 +45,10 @@ private:
     MemoryPagePtr allocate();
 
     void free_page(size_t id) {
-        std::lock_guard<std::mutex> lock(mt);
-        free_pages.push(id);
+        {
+            std::lock_guard<std::mutex> lock(mt);
+            free_pages.push(id);
+        }
         page_available.notify_one();
     }
 

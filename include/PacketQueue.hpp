@@ -14,6 +14,17 @@ public:
         queue_not_empty.notify_one();
     }
 
+    void flush_page(MemoryPagePtr&& page) {
+        std::unique_lock<std::mutex> lock(mt);
+        queue.push(std::move(page));
+        lock.unlock();
+        queue_not_empty.notify_one();
+    }
+
+    MemoryPagePtr get_new_page() {
+        return MemoryPagePtr(&pool);
+    }
+
     void push(const BlobPacket& packet) {
         std::unique_lock<std::mutex> lock(push_mt);
         if (!(push_page == nullptr) && push_page.full()) {
@@ -64,7 +75,7 @@ public:
 
 private:
     MemoryPool pool;
-    MemoryPagePtr push_page{&pool}, pop_page;
+    MemoryPagePtr push_page, pop_page;
     RingBufferQueue<BlobPacket*, MEMORY_PAGE_SIZE> pop_queue;
 
     std::mutex push_mt;
@@ -82,6 +93,14 @@ struct PacketQueuePtr {
 
     void push(const BlobPacket& packet) {
         queue->push(packet);
+    }
+
+    void flush_page(MemoryPagePtr&& page) {
+        queue->flush_page(std::move(page));
+    }
+
+    MemoryPagePtr get_new_page() {
+        return queue->get_new_page();
     }
 
     BlobPacket pop() {

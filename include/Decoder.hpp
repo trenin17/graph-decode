@@ -16,10 +16,12 @@ class Decoder {
 public:
     Decoder(size_t name, PacketQueuePtr incoming, std::vector<PacketQueuePtr> outgoing,
             std::function<void(const BlobPacket&)> func = [](const BlobPacket&){}) : incoming(incoming), outgoing(outgoing), id(name), processPacket(func) {
+        outgoing_pages.resize(outgoing.size());
     }
 
     void AddOutgoing(PacketQueuePtr queue) {
         outgoing.push_back(queue);
+        outgoing_pages.push_back(MemoryPagePtr{});
     }
 
     void AddPacketHandler(std::function<void(const BlobPacket&)> func) {
@@ -53,17 +55,33 @@ public:
         }
     }
 
+    void SendPacketToQueue(size_t queue_id, const BlobPacket& packet) {
+        auto& queue = outgoing[queue_id];
+        auto& push_page = outgoing_pages[queue_id];
+        if (!(push_page == nullptr) && push_page.full()) {
+            queue.flush_page(std::move(push_page));
+        }
+        if (push_page == nullptr) {
+            push_page = queue.get_new_page();
+        }
+        push_page.push(packet);
+        if (packet.is_eof) {
+            queue.flush_page(std::move(push_page));
+        }
+    }
+
     void SendPacket(BlobPacket& packet) {
         packet.prev_decoder = id;
-        //std::cout << "Sending packet " << packet.data << " to " << outgoing.size() << " queues" << std::endl;
-        for (auto& queue : outgoing) {
-            queue.push(packet);
+
+        for (size_t queue_id = 0; queue_id < outgoing.size(); queue_id++) {
+            SendPacketToQueue(queue_id, packet);
         }
     }
 
 private:
     PacketQueuePtr incoming;
     std::vector<PacketQueuePtr> outgoing;
+    std::vector<MemoryPagePtr> outgoing_pages;
     std::function<void(const BlobPacket&)> processPacket;
     size_t n_eofs = 0;
     size_t id = 0;
