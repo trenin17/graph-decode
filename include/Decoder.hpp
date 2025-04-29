@@ -39,7 +39,7 @@ public:
     }
 
     void Run() {
-        //bind_to_core(id);
+        // bind_to_core(id);
         //std::cout << "Running decoder" << std::endl;
         while (true) {
             BlobPacket packet = incoming.pop();
@@ -85,4 +85,5 @@ private:
     std::function<void(const BlobPacket&)> processPacket;
     size_t n_eofs = 0;
     size_t id = 0;
+    friend class Task;
 };

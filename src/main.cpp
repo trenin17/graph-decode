@@ -5,6 +5,8 @@
 #include <chrono>
 
 int main(int argc, char *argv[]) {
+    // std::this_thread::sleep_for(std::chrono::seconds(10));
+
     static_assert(sizeof(BlobPacket) == 128, "BlobPacket size is not 128 bytes");
 
     auto start = std::chrono::high_resolution_clock::now();

@@ -5,10 +5,10 @@
 #include <array>
 
 const size_t PACKET_DATA_SIZE = 119;
-const size_t MEMORY_PAGE_SIZE = 16;
+const size_t MEMORY_PAGE_SIZE = 1024;
 
 #pragma pack(push, 1)
-class BlobPacket{
+class alignas(64) BlobPacket{
 public:
     bool is_eof = false;
     char data[PACKET_DATA_SIZE];
