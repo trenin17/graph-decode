@@ -1,4 +1,4 @@
-#include <thread>
+#include <boost/thread.hpp>
 #include <iostream>
 #include "../include/Engine.hpp"
 
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 
     size_t n_total_packets = 0;
 
-    auto final_fiber = std::make_unique<std::thread>([&]() mutable {
+    auto final_fiber = std::make_unique<boost::thread>([&]() mutable {
         auto eof_cnt = 0;
         while (true) {
             auto packet = engine.popOutput();
